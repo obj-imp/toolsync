@@ -188,8 +188,10 @@ def read_current_tool_library():
             toolJson = json.loads(toolJsonString)
             newToolLib[toolJson['description']] = generate_airtable_entry(tool)
             toolCount += 1
-            if toolCount > 5:
-                break
+            
+            # DEBUG : limit number of tools read
+            #if toolCount > 5:
+            #    break
             adsk.doEvents()
 
         futil.log(f'DONE! (read {toolCount} tools out of {toolLib.count} in {targetLibName} library)')
