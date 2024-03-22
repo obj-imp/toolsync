@@ -11,3 +11,4 @@ TABLE_NAME = "xxxx"                  # airtable table name (from the url)
 targetLibName = 'S700 16K_121223'    # name of tool library to sync
 targetLibLocation = 'CLOUD'          # set to 'CLOUD' or 'LOCAL' accordingly
 syncInterval = 15                    # how often to sync tools to airtable in background (0 to disable background sync)
+maxToolsToRead = 1000                # maximum number of tools to read from tool table (useful to limit in debugging)

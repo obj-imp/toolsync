@@ -27,6 +27,7 @@ try:
     syncInterval = configuration.syncInterval
     targetLibName = configuration.targetLibName
     targetLibLocation = configuration.targetLibLocation
+    maxToolsToRead = configuration.maxToolsToRead
 except:
     futil.log(f"Failed to load configuration from configuration.py")
     exit(-1)
@@ -190,8 +191,9 @@ def read_current_tool_library():
             toolCount += 1
             
             # DEBUG : limit number of tools read
-            #if toolCount > 5:
-            #    break
+            if toolCount > maxToolsToRead:
+                break
+            
             adsk.doEvents()
 
         futil.log(f'DONE! (read {toolCount} tools out of {toolLib.count} in {targetLibName} library)')
