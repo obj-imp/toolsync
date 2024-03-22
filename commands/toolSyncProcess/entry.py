@@ -191,7 +191,7 @@ def read_current_tool_library():
             toolCount += 1
             
             # DEBUG : limit number of tools read
-            if toolCount = maxToolsToRead:
+            if toolCount == maxToolsToRead:
                 break
 
             adsk.doEvents()
