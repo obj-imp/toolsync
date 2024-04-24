@@ -147,9 +147,9 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
 
 
 def initialize_tool_library():
-    lastUpdateToolLibrary = copy.deepcopy(read_current_tool_library())
+    lastUpdateToolLibrary = copy.deepcopy(read_current_tool_library_by_query())
 
-def read_current_tool_library():
+def read_current_tool_library_by_name():
 
     try:
 
@@ -204,11 +204,62 @@ def read_current_tool_library():
 
     return newToolLib
 
+def read_current_tool_library_by_query():
+
+    try:
+
+        newToolLib = {}
+        futil.log(f'Attempting to create tool query for library')
+
+        # Get a reference to the CAMManager object.
+        camMgr = adsk.cam.CAMManager.get()
+
+        # Get the ToolLibraries object.
+        toolLibs = camMgr.libraryManager.toolLibraries
+
+        # Create a query object to query the local library.
+        query = toolLibs.createQuery(adsk.cam.LibraryLocations.CloudLibraryLocation)
+
+        # Could add a query criteria to search for a specific description. but instead get all tools
+
+        # Do the query.
+        queryResults = query.execute()
+
+        # Get the tool from the results. There can be multiple tools returned.
+        futil.log(f'Query returned {len(queryResults)} tools across all libraries')
+        
+        toolCount = 0
+        for result in queryResults:
+
+            if targetLibName != result.toolLibraryURL.toString().partition('//')[-1]:
+                continue
+
+            toolJsonString = result.tool.toJson()
+            #for debug to examine full json...
+            #futil.log(f'toolJsonString : {toolJsonString}')
+            toolJson = json.loads(toolJsonString)
+            newToolLib[toolJson['description']] = generate_airtable_entry(result.tool)
+            toolCount += 1
+            
+            # DEBUG : limit number of tools read
+            if toolCount == maxToolsToRead:
+                break
+
+            adsk.doEvents()
+
+        futil.log(f'DONE! (read {toolCount} tools in {targetLibName} library)')
+
+    except:
+        if ui:
+            ui.messageBox('Failed to read tool library:\n{}'.format(traceback.format_exc()))
+
+    return newToolLib
+
 
 def sync_all_tools():
 
     futil.log(f'Synchronizing all tools in library to airtable...')
-    newToolLib = read_current_tool_library()
+    newToolLib = read_current_tool_library_by_query()
     toolProcessed = 0
     toolsCreated = 0
     toolsUpdated = 0
