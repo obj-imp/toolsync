@@ -226,11 +226,17 @@ def read_current_tool_library_by_query():
         queryResults = query.execute()
 
         # Get the tool from the results. There can be multiple tools returned.
-        futil.log(f'Query returned {len(queryResults)} tools across all libraries')
         
         toolCount = 0
+        libsFound = {}
         for result in queryResults:
 
+            libURL = result.toolLibraryURL.toString()
+            if libURL not in libsFound.keys():
+                libsFound[libURL] = 1
+            else:
+                libsFound[libURL] += 1
+            
             if targetLibName != result.toolLibraryURL.toString().partition('//')[-1]:
                 continue
 
@@ -247,8 +253,9 @@ def read_current_tool_library_by_query():
 
             adsk.doEvents()
 
+        futil.log(f'Query returned {len(queryResults)} tools across all libraries {libsFound}')
         futil.log(f'DONE! (read {toolCount} tools in {targetLibName} library)')
-
+ 
     except:
         if ui:
             ui.messageBox('Failed to read tool library:\n{}'.format(traceback.format_exc()))
