@@ -147,8 +147,9 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
 
 
 def initialize_tool_library():
-    lastUpdateToolLibrary = copy.deepcopy(read_current_tool_library_by_query())
+    lastUpdateToolLibrary = copy.deepcopy(read_current_tool_library())
 
+#this method is more efficient but had some issues with not parsing libraries on at least one installation
 def read_current_tool_library_by_name():
 
     try:
@@ -204,6 +205,7 @@ def read_current_tool_library_by_name():
 
     return newToolLib
 
+#this method seems more robust across platforms
 def read_current_tool_library_by_query():
 
     try:
@@ -263,10 +265,14 @@ def read_current_tool_library_by_query():
     return newToolLib
 
 
+def read_current_tool_library():
+    # change this to read_current_tool_library_by_name() if you have issues with the query method
+    return read_current_tool_library_by_query()
+
 def sync_all_tools():
 
     futil.log(f'Synchronizing all tools in library to airtable...')
-    newToolLib = read_current_tool_library_by_query()
+    newToolLib = read_current_tool_library()
     toolProcessed = 0
     toolsCreated = 0
     toolsUpdated = 0
